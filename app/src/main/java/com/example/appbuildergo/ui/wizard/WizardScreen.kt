@@ -59,13 +59,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// MODEL DATA UNTUK MENYIMPAN STATE WIZARD
+// MODEL DATA UNTUK MENYIMPAN STATE WIZARD (TIDAK DIUBAH)
 data class WizardData(
     val appName: String = "",
     val conversionMode: String = "Situs Web (URL)",
@@ -93,17 +95,19 @@ fun WizardScreen() {
                         Text(
                             text = "App Builder Go",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "Langkah $currentStep dari 5",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            letterSpacing = 0.5.sp
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -123,11 +127,11 @@ fun WizardScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             // Stepper Indicator
             StepIndicator(currentStep = currentStep)
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Animasi transisi antar step
             AnimatedContent(
@@ -136,22 +140,10 @@ fun WizardScreen() {
                 label = "StepTransition"
             ) { step ->
                 when (step) {
-                    1 -> Step1App(
-                        data = wizardData,
-                        onDataChange = { wizardData = it }
-                    )
-                    2 -> Step2Appearance(
-                        data = wizardData,
-                        onDataChange = { wizardData = it }
-                    )
-                    3 -> Step3Features(
-                        data = wizardData,
-                        onDataChange = { wizardData = it }
-                    )
-                    4 -> Step4Permissions(
-                        data = wizardData,
-                        onDataChange = { wizardData = it }
-                    )
+                    1 -> Step1App(data = wizardData, onDataChange = { wizardData = it })
+                    2 -> Step2Appearance(data = wizardData, onDataChange = { wizardData = it })
+                    3 -> Step3Features(data = wizardData, onDataChange = { wizardData = it })
+                    4 -> Step4Permissions(data = wizardData, onDataChange = { wizardData = it })
                     5 -> Step5Done(data = wizardData)
                 }
             }
@@ -167,40 +159,55 @@ private fun BottomNavigationBar(
     onNext: () -> Unit,
     onGenerate: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        if (currentStep > 1) {
-            OutlinedButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Text("Kembali", color = MaterialTheme.colorScheme.onSurface)
-            }
-        }
-
-        Button(
-            onClick = { if (currentStep == 5) onGenerate() else onNext() },
+    Column {
+        // Subtle top border/glow untuk memisahkan bottom bar dari konten
+        Box(
             modifier = Modifier
-                .weight(if (currentStep > 1) 2f else 1f)
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), Color.Transparent)
+                    )
+                )
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.95f))
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = if (currentStep == 5) "Generate Aplikasi" else "Selanjutnya",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            if (currentStep > 1) {
+                OutlinedButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
+                ) {
+                    Text("Kembali", fontWeight = FontWeight.SemiBold)
+                }
+            }
+            Button(
+                onClick = { if (currentStep == 5) onGenerate() else onNext() },
+                modifier = Modifier
+                    .weight(if (currentStep > 1) 2f else 1f)
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+            ) {
+                Text(
+                    text = if (currentStep == 5) "Generate Aplikasi" else "Selanjutnya",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
     }
 }
@@ -209,63 +216,39 @@ private fun BottomNavigationBar(
 @Composable
 private fun Step1App(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "1", title = "Data Aplikasi", icon = Icons.Default.PhoneAndroid) {
-        Text("Mode Konversi", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-        Spacer(Modifier.height(8.dp))
+        Text("Mode Konversi", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+        Spacer(Modifier.height(12.dp))
         
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically, 
-                modifier = Modifier.fillMaxWidth().clickable { onDataChange(data.copy(conversionMode = "Situs Web (URL)")) }
-            ) {
-                RadioButton(
-                    selected = data.conversionMode == "Situs Web (URL)", 
-                    onClick = { onDataChange(data.copy(conversionMode = "Situs Web (URL)")) }, 
-                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
-                )
-                Text("Situs Web (URL)", color = MaterialTheme.colorScheme.onBackground)
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically, 
-                modifier = Modifier.fillMaxWidth().clickable { onDataChange(data.copy(conversionMode = "ZIP Offline")) }
-            ) {
-                RadioButton(
-                    selected = data.conversionMode == "ZIP Offline", 
-                    onClick = { onDataChange(data.copy(conversionMode = "ZIP Offline")) }, 
-                    colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
-                )
-                Text("ZIP Offline", color = MaterialTheme.colorScheme.onBackground)
-            }
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            PremiumRadioButton(
+                selected = data.conversionMode == "Situs Web (URL)",
+                onClick = { onDataChange(data.copy(conversionMode = "Situs Web (URL)")) },
+                text = "Situs Web (URL)"
+            )
+            PremiumRadioButton(
+                selected = data.conversionMode == "ZIP Offline",
+                onClick = { onDataChange(data.copy(conversionMode = "ZIP Offline")) },
+                text = "ZIP Offline"
+            )
         }
-
-        Spacer(Modifier.height(16.dp))
-        OutlinedTextField(
+        
+        Spacer(Modifier.height(24.dp))
+        
+        PremiumTextField(
             value = data.appName,
             onValueChange = { onDataChange(data.copy(appName = it)) },
-            label = { Text("Nama Aplikasi") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            label = "Nama Aplikasi"
         )
         
-        Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
+        Spacer(Modifier.height(16.dp))
+        
+        PremiumTextField(
             value = data.htmlCode,
             onValueChange = { onDataChange(data.copy(htmlCode = it)) },
-            label = { Text("Kode HTML (Opsional)") },
-            leadingIcon = { Icon(Icons.Default.Code, contentDescription = "Code", tint = MaterialTheme.colorScheme.onSurfaceVariant) },
-            modifier = Modifier.fillMaxWidth().height(120.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            label = "Kode HTML (Opsional)",
+            leadingIcon = Icons.Default.Code,
+            minLines = 4,
+            maxLines = 6
         )
     }
 }
@@ -280,32 +263,45 @@ private fun Step2Appearance(data: WizardData, onDataChange: (WizardData) -> Unit
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Splash Screen", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
-                Text("Tampilkan saat aplikasi dibuka", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                Text("Splash Screen", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Tampilkan saat aplikasi dibuka", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(
                 checked = data.splashEnabled,
                 onCheckedChange = { onDataChange(data.copy(splashEnabled = it)) },
-                colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.primary)
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White, 
+                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    uncheckedTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                )
             )
         }
 
-        Spacer(Modifier.height(24.dp))
-        Text("Warna Tema Utama", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(28.dp))
+        Text("Warna Tema Utama", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+        Spacer(Modifier.height(16.dp))
         
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            val colors = listOf(Color(0xFF5C5CFF), Color(0xFF4CAF50), Color(0xFFF44336), Color(0xFFFF9800))
+            val colors = listOf(Color(0xFF5C5CFF), Color(0xFF4CAF50), Color(0xFFF44336), Color(0xFFFF9800), Color(0xFF00BCD4))
             colors.forEach { color ->
+                val isSelected = data.themeColor == color
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(color)
                         .border(
-                            width = if (data.themeColor == color) 3.dp else 0.dp,
-                            color = if (data.themeColor == color) Color.White else Color.Transparent,
+                            width = if (isSelected) 3.dp else 0.dp,
+                            color = if (isSelected) Color.White else Color.Transparent,
                             shape = CircleShape
+                        )
+                        .shadow(
+                            elevation = if (isSelected) 8.dp else 0.dp,
+                            shape = CircleShape,
+                            ambientColor = color,
+                            spotColor = color
                         )
                         .clickable { onDataChange(data.copy(themeColor = color)) }
                 )
@@ -338,7 +334,7 @@ private fun Step3Features(data: WizardData, onDataChange: (WizardData) -> Unit) 
 @Composable
 private fun Step4Permissions(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "4", title = "Izin Akses", icon = Icons.Default.Lock) {
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             PermissionCheckbox("Akses Kamera", data.permCamera) { onDataChange(data.copy(permCamera = it)) }
             PermissionCheckbox("Akses Lokasi (GPS)", data.permLocation) { onDataChange(data.copy(permLocation = it)) }
             PermissionCheckbox("Penyimpanan File", data.permStorage) { onDataChange(data.copy(permStorage = it)) }
@@ -353,12 +349,12 @@ private fun Step5Done(data: WizardData) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Ringkasan Aplikasi", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(12.dp))
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text("Ringkasan Aplikasi", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(Modifier.height(16.dp))
                 SummaryRow("Nama", if (data.appName.isBlank()) "(Belum diisi)" else data.appName)
                 SummaryRow("Mode", data.conversionMode)
                 SummaryRow("Offline", if (data.offlineSupport) "Ya" else "Tidak")
@@ -368,35 +364,58 @@ private fun Step5Done(data: WizardData) {
     }
 }
 
-// --- KOMPONEN PENDUKUNG ---
+// --- KOMPONEN PENDUKUNG (PREMIUM UI) ---
 
 @Composable
 private fun StepCard(step: String, title: String, icon: ImageVector, content: @Composable () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.08f), // Glass border
+                shape = RoundedCornerShape(24.dp)
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(24.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(24.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+                        .background(
+                            brush = Brush.radialGradient(
+                                colors = listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f), Color.Transparent)
+                            )
+                        )
+                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                    Icon(
+                        icon, 
+                        contentDescription = null, 
+                        tint = MaterialTheme.colorScheme.primary, 
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "$step. $title",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = "LANGKAH $step",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        letterSpacing = 1.sp
+                    )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             content()
         }
     }
@@ -406,40 +425,130 @@ private fun StepCard(step: String, title: String, icon: ImageVector, content: @C
 private fun StepIndicator(currentStep: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         for (i in 1..5) {
+            val isActive = i <= currentStep
+            val isCurrent = i == currentStep
+            
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(4.dp)
-                    .padding(horizontal = 2.dp)
-                    .clip(RoundedCornerShape(2.dp))
+                    .padding(horizontal = 4.dp)
+                    .size(if (isCurrent) 12.dp else 8.dp)
+                    .clip(CircleShape)
                     .background(
-                        if (i <= currentStep) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.surfaceVariant
+                        if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                     )
-            ) {}
+                    .then(
+                        if (isCurrent) Modifier.border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), CircleShape) else Modifier
+                    )
+            )
+            if (i < 5) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(2.dp)
+                        .background(
+                            if (i < currentStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        )
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun PremiumTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    leadingIcon: ImageVector? = null,
+    maxLines: Int = 1,
+    minLines: Int = 1
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = leadingIcon?.let { { Icon(it, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) } },
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        maxLines = maxLines,
+        minLines = minLines,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
+    )
+}
+
+@Composable
+private fun PremiumRadioButton(selected: Boolean, onClick: () -> Unit, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.Transparent)
+            .border(
+                width = 1.dp,
+                color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable { onClick() }
+            .padding(16.dp)
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text, 
+            style = MaterialTheme.typography.bodyLarge, 
+            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+        )
     }
 }
 
 @Composable
 private fun FeatureToggle(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
-            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        Spacer(modifier = Modifier.width(16.dp))
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = MaterialTheme.colorScheme.primary)
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                uncheckedTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            )
         )
     }
 }
@@ -450,25 +559,31 @@ private fun PermissionCheckbox(title: String, checked: Boolean, onCheckedChange:
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
             .clickable { onCheckedChange(!checked) }
-            .padding(vertical = 4.dp)
+            .padding(vertical = 8.dp, horizontal = 4.dp)
     ) {
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary, checkmarkColor = Color.White)
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                checkmarkColor = Color.White,
+                uncheckedColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+            )
         )
-        Text(title, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
 @Composable
 private fun SummaryRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
-        Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
     }
 }
