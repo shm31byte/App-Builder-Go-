@@ -4,3 +4,9 @@
         <!-- Dikosongkan, biarkan Compose yang mengatur warna secara native -->
     </style>
 </resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AppBuilderGo" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
+    </style>
+</resources>
