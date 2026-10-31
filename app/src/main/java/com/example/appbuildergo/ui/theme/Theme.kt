@@ -3,22 +3,22 @@ package com.example.appbuildergo.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val DarkColors = darkColorScheme(
-    primary = PurpleAccent,
-    onPrimary = Color.White,
-    primaryContainer = PurpleAccentDark,
-    onPrimaryContainer = Color.White,
-    secondary = PurpleAccent,
-    onSecondary = Color.White,
-    background = DarkBackground,
-    onBackground = OnDark,
-    surface = DarkSurface,
-    onSurface = OnDark,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = OnDarkMuted,
-    outline = OnDarkMuted
+private val PremiumDarkColors = darkColorScheme(
+    primary = NeonPurple,
+    onPrimary = TextPrimary,
+    primaryContainer = NeonPurpleDark,
+    onPrimaryContainer = TextPrimary,
+    secondary = NeonPurple,
+    onSecondary = TextPrimary,
+    background = DeepSpaceBlack,
+    onBackground = TextPrimary,
+    surface = DarkGlassSurface,
+    onSurface = TextPrimary,
+    surfaceVariant = DarkGlassSurface,
+    onSurfaceVariant = TextSecondary,
+    outline = GlassBorder,
+    outlineVariant = GlassBorder
 )
 
 @Composable
@@ -26,7 +26,7 @@ fun AppBuilderGoTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = DarkColors,
+        colorScheme = PremiumDarkColors,
         typography = AppTypography,
         content = content
     )
