@@ -38,7 +38,6 @@ object BuildRepository {
 
     fun totalSizeMb(): Double = _builds.value.sumOf { it.apkSizeMb }
 
-    // TODO(AI logic): ganti dengan Room / scan folder APK asli bila engine build sudah siap
     private fun persist() = runCatching {
         val arr = JSONArray()
         _builds.value.forEach { arr.put(serialize(it)) }
