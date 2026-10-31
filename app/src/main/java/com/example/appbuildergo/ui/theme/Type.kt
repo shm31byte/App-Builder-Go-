@@ -12,7 +12,7 @@ val AppTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
         lineHeight = 36.sp,
-        letterSpacing = (-0.5).sp // Tracking lebih rapat untuk header besar agar solid
+        letterSpacing = (-0.5).sp
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
@@ -33,7 +33,7 @@ val AppTypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp // Tracking lebih lebar agar teks "bernapas" dan mudah dibaca
+        letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.SansSerif,
