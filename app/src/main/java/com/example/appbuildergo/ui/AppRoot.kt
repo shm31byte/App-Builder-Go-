@@ -7,13 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Construction
@@ -30,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -93,15 +93,7 @@ fun MainTabBar(
             Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color.Transparent,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
-                            Color.Transparent
-                        )
-                    )
-                )
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
         )
         Row(
             Modifier
@@ -164,7 +156,7 @@ private fun TabItem(
             tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp)
         )
-        androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
+        Spacer(Modifier.size(8.dp))
         Text(
             text = label,
             fontSize = 13.sp,
@@ -172,7 +164,7 @@ private fun TabItem(
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (badge > 0) {
-            androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+            Spacer(Modifier.size(6.dp))
             Box(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(9.dp))
