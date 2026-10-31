@@ -1,6 +1,5 @@
 package com.example.appbuildergo.ui.build
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,20 +8,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -176,7 +177,6 @@ fun PackagingScreen(
         }
 
         // TODO(AI logic): ganti simulasi ini dengan panggilan engine build asli.
-        // Engine cukup memanggil BuildLogger.i/ok/w/e/d + BuildRepository.save(...) di akhir.
         for (line in buildScript(config)) {
             delay(line.delayMs)
             if (line.stageActive >= 0) stages = stages.toMutableList().also { it[line.stageActive] = StageState.ACTIVE }
@@ -202,7 +202,15 @@ fun PackagingScreen(
             BuildRecord(
                 appName = config.appName,
                 packageName = "com.example.${packageSlug(config.appName)}",
-                themeColorHex = String.format("#%08X", android.graphics.Color.argb(255, (config.themeColor.red * 255).toInt(), (config.themeColor.green * 255).toInt(), (config.themeColor.blue * 255).toInt())),
+                themeColorHex = String.format(
+                    "#%08X",
+                    android.graphics.Color.argb(
+                        255,
+                        (config.themeColor.red * 255).toInt(),
+                        (config.themeColor.green * 255).toInt(),
+                        (config.themeColor.blue * 255).toInt()
+                    )
+                ),
                 modeLabel = config.conversionMode,
                 apkSizeMb = Math.round(sizeMb * 10) / 10.0,
                 durationLabel = "${String.format(Locale.US, "%.1f", durationSec)}s",
@@ -312,7 +320,7 @@ fun PackagingScreen(
             Modifier
                 .fillMaxSize()
                 .padding(pv)
-                .verticalScrollSafe()
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             // HERO
@@ -414,12 +422,7 @@ fun PackagingScreen(
                                 StageState.ACTIVE -> MaterialTheme.colorScheme.primary
                                 StageState.PENDING -> Color.White.copy(alpha = 0.12f)
                             }
-                            Box(
-                                Modifier
-                                    .size(10.dp)
-                                    .clip(CircleShape)
-                                    .background(dotColor)
-                            )
+                            Box(Modifier.size(10.dp).clip(CircleShape).background(dotColor))
                             Spacer(Modifier.width(10.dp))
                             Text(
                                 text = STAGE_NAMES[index],
@@ -494,20 +497,9 @@ fun PackagingScreen(
                     ) {
                         items(visibleEntries) { entry ->
                             Row(Modifier.padding(vertical = 1.dp)) {
-                                Text(
-                                    text = entry.timestamp,
-                                    fontSize = 10.5.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    color = Color(0xFF44445C)
-                                )
+                                Text(entry.timestamp, fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, color = Color(0xFF44445C))
                                 Spacer(Modifier.width(8.dp))
-                                Text(
-                                    text = entry.level.name.padEnd(5),
-                                    fontSize = 10.5.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                    fontWeight = FontWeight.Bold,
-                                    color = levelColor(entry.level)
-                                )
+                                Text(entry.level.name.padEnd(5), fontSize = 10.5.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, color = levelColor(entry.level))
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     text = entry.message,
@@ -573,6 +565,3 @@ private fun levelColor(level: LogLevel): Color = when (level) {
     LogLevel.DEBUG -> Color(0xFF6B7280)
     LogLevel.DONE -> Color(0xFF5C5CFF)
 }
-
-private fun Modifier.verticalScrollSafe(): Modifier =
-    this.then(androidx.compose.foundation.verticalScroll(androidx.compose.foundation.rememberScrollState()))
