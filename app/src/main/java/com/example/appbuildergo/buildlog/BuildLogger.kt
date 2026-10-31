@@ -18,11 +18,6 @@ data class LogEntry(
     fun render(): String = "[$timestamp] [${level.name.padEnd(5)}] $message"
 }
 
-/**
- * Single source of truth log pembungkusan.
- * UI meng-collect [entries]; engine build asli (AI logic) cukup memanggil i/ok/w/e/d/done.
- * Setiap entri juga di-mirror ke Logcat (tag: AppBuilderGo/Build).
- */
 object BuildLogger {
     private const val TAG = "AppBuilderGo/Build"
 
