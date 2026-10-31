@@ -67,7 +67,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// MODEL DATA UNTUK MENYIMPAN STATE WIZARD (TIDAK DIUBAH - KONTRAK UNTUK AI LOGIC)
 data class WizardData(
     val appName: String = "",
     val conversionMode: String = "Situs Web (URL)",
@@ -215,7 +214,6 @@ private fun WizardNavRow(
     }
 }
 
-// --- KOMPONEN STEP 1 ---
 @Composable
 private fun Step1App(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "1", title = "Data Aplikasi", icon = Icons.Default.PhoneAndroid) {
@@ -251,7 +249,6 @@ private fun Step1App(data: WizardData, onDataChange: (WizardData) -> Unit) {
     }
 }
 
-// --- KOMPONEN STEP 2 ---
 @Composable
 private fun Step2Appearance(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "2", title = "Tampilan", icon = Icons.Default.ColorLens) {
@@ -306,7 +303,6 @@ private fun Step2Appearance(data: WizardData, onDataChange: (WizardData) -> Unit
     }
 }
 
-// --- KOMPONEN STEP 3 ---
 @Composable
 private fun Step3Features(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "3", title = "Fitur Tambahan", icon = Icons.Default.Extension) {
@@ -326,7 +322,6 @@ private fun Step3Features(data: WizardData, onDataChange: (WizardData) -> Unit) 
     }
 }
 
-// --- KOMPONEN STEP 4 ---
 @Composable
 private fun Step4Permissions(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "4", title = "Izin Akses", icon = Icons.Default.Lock) {
@@ -338,7 +333,6 @@ private fun Step4Permissions(data: WizardData, onDataChange: (WizardData) -> Uni
     }
 }
 
-// --- KOMPONEN STEP 5 ---
 @Composable
 private fun Step5Done(data: WizardData) {
     StepCard(step = "5", title = "Selesai", icon = Icons.Default.CheckCircle) {
@@ -360,7 +354,6 @@ private fun Step5Done(data: WizardData) {
     }
 }
 
-// --- KOMPONEN PENDUKUNG (PREMIUM UI) ---
 @Composable
 private fun StepCard(step: String, title: String, icon: ImageVector, content: @Composable () -> Unit) {
     Card(
