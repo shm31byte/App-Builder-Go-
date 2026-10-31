@@ -1,0 +1,63 @@
+package com.example.appbuildergo.data
+
+import androidx.compose.ui.graphics.Color
+import com.example.appbuildergo.ui.wizard.WizardData
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+enum class BuildStatus { SUCCESS, FAILED }
+
+data class BuildRecord(
+    val id: Long = System.currentTimeMillis(),
+    val appName: String,
+    val packageName: String,
+    val versionName: String = "1.0.0",
+    val themeColorHex: String = "#FF5C5CFF",
+    val modeLabel: String,
+    val apkSizeMb: Double,
+    val durationLabel: String,
+    val createdAtMillis: Long = System.currentTimeMillis(),
+    val status: BuildStatus,
+    val errorMessage: String? = null,
+    val logLines: List<String> = emptyList(),
+    val apkPath: String? = null,
+    val configSnapshot: WizardData? = null
+) {
+    fun themeColor(): Color = hexToColor(themeColorHex)
+    fun initials(): String = appInitials(appName)
+    fun dateLabel(): String = buildDateLabel(createdAtMillis)
+}
+
+fun hexToColor(hex: String): Color = runCatching {
+    Color(android.graphics.Color.parseColor(hex))
+}.getOrDefault(Color(0xFF5C5CFF))
+
+fun appInitials(name: String): String {
+    val words = name.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+    if (words.isEmpty()) return "AB"
+    val first = words[0].first()
+    val second = words.getOrNull(1)?.first() ?: ''
+    return "$first$second".uppercase()
+}
+
+fun packageSlug(name: String): String {
+    val slug = name.lowercase().replace(Regex("[^a-z0-9]+"), "").take(20)
+    return slug.ifBlank { "app" }
+}
+
+fun buildDateLabel(millis: Long): String {
+    val cal = Calendar.getInstance().apply { timeInMillis = millis }
+    val now = Calendar.getInstance()
+    val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+    val timeFmt = SimpleDateFormat("HH:mm", Locale.getDefault())
+    return when {
+        isSameDay(cal, now) -> "Hari ini, ${timeFmt.format(cal.time)}"
+        isSameDay(cal, yesterday) -> "Kemarin, ${timeFmt.format(cal.time)}"
+        else -> SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(cal.time)
+    }
+}
+
+private fun isSameDay(a: Calendar, b: Calendar): Boolean =
+    a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
+        a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR)
