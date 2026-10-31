@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base theme platform, tidak butuh dependency Material Components.
-         Warna & tipografi sebenarnya diatur di Compose (ui/theme). -->
     <style name="Theme.AppBuilderGo" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/window_background</item>
-        <item name="android:statusBarColor">@color/window_background</item>
-        <item name="android:navigationBarColor">@color/window_background</item>
+        <!-- Dikosongkan, biarkan Compose yang mengatur warna secara native -->
     </style>
 </resources>
