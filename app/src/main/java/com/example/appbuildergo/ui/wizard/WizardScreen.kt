@@ -67,7 +67,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// MODEL DATA UNTUK MENYIMPAN STATE WIZARD (TIDAK DIUBAH)
+// MODEL DATA UNTUK MENYIMPAN STATE WIZARD (TIDAK DIUBAH - KONTRAK UNTUK AI LOGIC)
 data class WizardData(
     val appName: String = "",
     val conversionMode: String = "Situs Web (URL)",
@@ -83,7 +83,10 @@ data class WizardData(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WizardScreen() {
+fun WizardScreen(
+    onGenerate: (WizardData) -> Unit = {},
+    tabBar: (@Composable () -> Unit)? = null
+) {
     var currentStep by remember { mutableIntStateOf(1) }
     var wizardData by remember { mutableStateOf(WizardData()) }
 
@@ -113,12 +116,16 @@ fun WizardScreen() {
             )
         },
         bottomBar = {
-            BottomNavigationBar(
-                currentStep = currentStep,
-                onBack = { if (currentStep > 1) currentStep-- },
-                onNext = { if (currentStep < 5) currentStep++ },
-                onGenerate = { /* Logic generate APK nanti di sini */ }
-            )
+            Column {
+                WizardNavRow(
+                    currentStep = currentStep,
+                    nextEnabled = currentStep != 1 || wizardData.appName.isNotBlank(),
+                    onBack = { if (currentStep > 1) currentStep-- },
+                    onNext = { if (currentStep < 5) currentStep++ },
+                    onGenerate = { onGenerate(wizardData) }
+                )
+                tabBar?.invoke()
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
@@ -129,11 +136,8 @@ fun WizardScreen() {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            // Stepper Indicator
             StepIndicator(currentStep = currentStep)
             Spacer(modifier = Modifier.height(32.dp))
-
-            // Animasi transisi antar step
             AnimatedContent(
                 targetState = currentStep,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
@@ -153,21 +157,21 @@ fun WizardScreen() {
 }
 
 @Composable
-private fun BottomNavigationBar(
+private fun WizardNavRow(
     currentStep: Int,
+    nextEnabled: Boolean,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onGenerate: () -> Unit
 ) {
     Column {
-        // Subtle top border/glow untuk memisahkan bottom bar dari konten
         Box(
-            modifier = Modifier
+            Modifier
                 .fillMaxWidth()
                 .height(1.dp)
                 .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), Color.Transparent)
+                    Brush.horizontalGradient(
+                        listOf(Color.Transparent, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), Color.Transparent)
                     )
                 )
         )
@@ -182,9 +186,7 @@ private fun BottomNavigationBar(
             if (currentStep > 1) {
                 OutlinedButton(
                     onClick = onBack,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
+                    modifier = Modifier.weight(1f).height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface)
@@ -194,6 +196,7 @@ private fun BottomNavigationBar(
             }
             Button(
                 onClick = { if (currentStep == 5) onGenerate() else onNext() },
+                enabled = nextEnabled,
                 modifier = Modifier
                     .weight(if (currentStep > 1) 2f else 1f)
                     .height(56.dp),
@@ -218,7 +221,6 @@ private fun Step1App(data: WizardData, onDataChange: (WizardData) -> Unit) {
     StepCard(step = "1", title = "Data Aplikasi", icon = Icons.Default.PhoneAndroid) {
         Text("Mode Konversi", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
         Spacer(Modifier.height(12.dp))
-        
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             PremiumRadioButton(
                 selected = data.conversionMode == "Situs Web (URL)",
@@ -231,17 +233,13 @@ private fun Step1App(data: WizardData, onDataChange: (WizardData) -> Unit) {
                 text = "ZIP Offline"
             )
         }
-        
         Spacer(Modifier.height(24.dp))
-        
         PremiumTextField(
             value = data.appName,
             onValueChange = { onDataChange(data.copy(appName = it)) },
             label = "Nama Aplikasi"
         )
-        
         Spacer(Modifier.height(16.dp))
-        
         PremiumTextField(
             value = data.htmlCode,
             onValueChange = { onDataChange(data.copy(htmlCode = it)) },
@@ -271,18 +269,16 @@ private fun Step2Appearance(data: WizardData, onDataChange: (WizardData) -> Unit
                 checked = data.splashEnabled,
                 onCheckedChange = { onDataChange(data.copy(splashEnabled = it)) },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White, 
+                    checkedThumbColor = Color.White,
                     checkedTrackColor = MaterialTheme.colorScheme.primary,
                     uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     uncheckedTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                 )
             )
         }
-
         Spacer(Modifier.height(28.dp))
         Text("Warna Tema Utama", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
         Spacer(Modifier.height(16.dp))
-        
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             val colors = listOf(Color(0xFF5C5CFF), Color(0xFF4CAF50), Color(0xFFF44336), Color(0xFFFF9800), Color(0xFF00BCD4))
             colors.forEach { color ->
@@ -365,7 +361,6 @@ private fun Step5Done(data: WizardData) {
 }
 
 // --- KOMPONEN PENDUKUNG (PREMIUM UI) ---
-
 @Composable
 private fun StepCard(step: String, title: String, icon: ImageVector, content: @Composable () -> Unit) {
     Card(
@@ -373,7 +368,7 @@ private fun StepCard(step: String, title: String, icon: ImageVector, content: @C
             .fillMaxWidth()
             .border(
                 width = 1.dp,
-                color = Color.White.copy(alpha = 0.08f), // Glass border
+                color = Color.White.copy(alpha = 0.08f),
                 shape = RoundedCornerShape(24.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -393,12 +388,7 @@ private fun StepCard(step: String, title: String, icon: ImageVector, content: @C
                         .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        icon, 
-                        contentDescription = null, 
-                        tint = MaterialTheme.colorScheme.primary, 
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
@@ -408,11 +398,7 @@ private fun StepCard(step: String, title: String, icon: ImageVector, content: @C
                         color = MaterialTheme.colorScheme.primary,
                         letterSpacing = 1.sp
                     )
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text(text = title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -431,7 +417,6 @@ private fun StepIndicator(currentStep: Int) {
         for (i in 1..5) {
             val isActive = i <= currentStep
             val isCurrent = i == currentStep
-            
             Box(
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
@@ -515,8 +500,8 @@ private fun PremiumRadioButton(selected: Boolean, onClick: () -> Unit, text: Str
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text, 
-            style = MaterialTheme.typography.bodyLarge, 
+            text,
+            style = MaterialTheme.typography.bodyLarge,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
         )
