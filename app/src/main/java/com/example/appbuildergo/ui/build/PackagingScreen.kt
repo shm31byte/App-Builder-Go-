@@ -56,7 +56,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -176,7 +175,6 @@ fun PackagingScreen(
             return@LaunchedEffect
         }
 
-        // TODO(AI logic): ganti simulasi ini dengan panggilan engine build asli.
         for (line in buildScript(config)) {
             delay(line.delayMs)
             if (line.stageActive >= 0) stages = stages.toMutableList().also { it[line.stageActive] = StageState.ACTIVE }
@@ -196,7 +194,7 @@ fun PackagingScreen(
         val durationSec = (System.currentTimeMillis() - started) / 1000.0
         val sizeMb = 2.0 + config.htmlCode.length / 2048.0 + if (config.offlineSupport) 1.2 else 0.0
         resultSizeMb = sizeMb.toFloat()
-        BuildLogger.done("Pembungkusan selesai dalam ${String.format(Locale.US, "%.1f", durationSec)} detik 🎉")
+        BuildLogger.done("Pembungkusan selesai dalam ${String.format(Locale.US, "%.1f", durationSec)} detik")
         phase = PackPhase.SUCCESS
         BuildRepository.save(
             BuildRecord(
@@ -261,11 +259,7 @@ fun PackagingScreen(
                     Modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(Color.Transparent, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), Color.Transparent)
-                            )
-                        )
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
                 )
                 Row(
                     Modifier
@@ -278,7 +272,7 @@ fun PackagingScreen(
                     OutlinedButton(
                         onClick = {
                             clipboard.setText(AnnotatedString(allEntries.joinToString("\n") { it.render() }))
-                            scope.launch { snackbar.showSnackbar("📋 Log disalin ke clipboard") }
+                            scope.launch { snackbar.showSnackbar("Log disalin ke clipboard") }
                         },
                         modifier = Modifier.weight(1f).height(54.dp),
                         shape = RoundedCornerShape(16.dp)
@@ -303,7 +297,7 @@ fun PackagingScreen(
                         Text(
                             text = when (phase) {
                                 PackPhase.RUNNING -> "Sedang Membungkus…"
-                                PackPhase.SUCCESS -> "Selesai ✓"
+                                PackPhase.SUCCESS -> "Selesai"
                                 PackPhase.FAILED -> "Coba Lagi"
                             },
                             fontWeight = FontWeight.Bold,
@@ -323,7 +317,6 @@ fun PackagingScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // HERO
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -335,7 +328,7 @@ fun PackagingScreen(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Brush.linearGradient(listOf(config.themeColor, config.themeColor.copy(alpha = 0.6f)))),
+                            .background(config.themeColor),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(appInitials(config.appName), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
@@ -367,7 +360,6 @@ fun PackagingScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // PROGRESS
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -402,7 +394,6 @@ fun PackagingScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // STAGES
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -452,7 +443,6 @@ fun PackagingScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // CONSOLE
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0B0B12)),
@@ -517,7 +507,6 @@ fun PackagingScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // BANNERS
             if (phase == PackPhase.SUCCESS) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
