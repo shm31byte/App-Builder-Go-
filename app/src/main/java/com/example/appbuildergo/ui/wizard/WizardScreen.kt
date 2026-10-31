@@ -60,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -168,11 +167,7 @@ private fun WizardNavRow(
             Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(Color.Transparent, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), Color.Transparent)
-                    )
-                )
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
         )
         Row(
             modifier = Modifier
@@ -373,11 +368,7 @@ private fun StepCard(step: String, title: String, icon: ImageVector, content: @C
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f), Color.Transparent)
-                            )
-                        )
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                         .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
