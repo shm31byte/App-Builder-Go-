@@ -12,7 +12,6 @@ import com.example.appbuildergo.ui.theme.AppBuilderGoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // FIX STATUS BAR PUTIH: edge-to-edge dengan status bar & navigation bar gelap transparan
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
