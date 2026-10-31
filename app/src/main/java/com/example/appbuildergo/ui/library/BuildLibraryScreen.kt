@@ -1,6 +1,5 @@
 package com.example.appbuildergo.ui.library
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +34,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,13 +53,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
@@ -121,7 +122,6 @@ fun BuildLibraryScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // STATS + STORAGE
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -155,39 +155,35 @@ fun BuildLibraryScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // SEARCH
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .background(Color.White.copy(alpha = 0.03f), RoundedCornerShape(14.dp))
-                    .border(1.dp, Color.White.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = 12.dp).size(16.dp))
-                    androidx.compose.material3.OutlinedTextField(
-                        value = query,
-                        onValueChange = { query = it },
-                        placeholder = { Text("Cari nama aplikasi...", fontSize = 13.5.sp) },
-                        trailingIcon = {
-                            if (query.isNotBlank()) {
-                                Icon(Icons.Rounded.Close, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 8.dp).size(16.dp).clickable { query = "" })
-                            }
-                        },
-                        colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            cursorColor = MaterialTheme.colorScheme.primary
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                }
-            }
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                placeholder = { Text("Cari nama aplikasi...", fontSize = 13.5.sp) },
+                leadingIcon = { Icon(Icons.Rounded.Search, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
+                trailingIcon = {
+                    if (query.isNotBlank()) {
+                        Icon(
+                            Icons.Rounded.Close,
+                            null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(end = 8.dp).size(18.dp).clickable { query = "" }
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.08f),
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                )
+            )
 
             Spacer(Modifier.height(10.dp))
 
-            // FILTER CHIPS
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LibChip("Semua", filter == LibFilter.ALL) { filter = LibFilter.ALL }
                 LibChip("Sukses", filter == LibFilter.SUCCESS) { filter = LibFilter.SUCCESS }
@@ -242,10 +238,10 @@ fun BuildLibraryScreen(
                         onCopyConfig = {
                             clipboard.setText(
                                 AnnotatedString(
-                                    """{"appName":"${rec.appName}","packageName":"${rec.packageName}","version":"${rec.versionName}","mode":"${rec.modeLabel}"}"""
+                                    "{\"appName\":\"${rec.appName}\",\"packageName\":\"${rec.packageName}\",\"version\":\"${rec.versionName}\",\"mode\":\"${rec.modeLabel}\"}"
                                 )
                             )
-                            scope.launch { snackbar.showSnackbar("📄 Config disalin!") }
+                            scope.launch { snackbar.showSnackbar("Config disalin!") }
                         },
                         onDelete = { pendingDelete = rec },
                         onRebuild = { onRebuild(rec) }
@@ -267,7 +263,7 @@ fun BuildLibraryScreen(
                     onClick = {
                         BuildRepository.delete(rec.id)
                         pendingDelete = null
-                        scope.launch { snackbar.showSnackbar("🗑 Build dihapus (${rec.apkSizeMb} MB bebas)") }
+                        scope.launch { snackbar.showSnackbar("Build dihapus (${rec.apkSizeMb} MB bebas)") }
                     }
                 ) { Text("Hapus", color = Color(0xFFF87171), fontWeight = FontWeight.Bold) }
             },
@@ -326,7 +322,7 @@ private fun EmptyState(onOpenWizard: () -> Unit) {
             modifier = Modifier
                 .size(86.dp)
                 .clip(CircleShape)
-                .background(Brush.radialGradient(listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), Color.Transparent)))
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
                 .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
@@ -339,7 +335,7 @@ private fun EmptyState(onOpenWizard: () -> Unit) {
             "Hasil pembungkusan aplikasi Anda akan tersimpan rapi di sini — siap dipasang ulang kapan saja tanpa mengulang wizard.",
             fontSize = 12.5.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(18.dp))
         Button(
@@ -348,7 +344,7 @@ private fun EmptyState(onOpenWizard: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
         ) {
-            Text("＋ Buat Aplikasi Pertama", fontWeight = FontWeight.Bold, color = Color.White)
+            Text("+ Buat Aplikasi Pertama", fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
@@ -378,19 +374,14 @@ private fun BuildCard(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Brush.linearGradient(listOf(record.themeColor(), record.themeColor().copy(alpha = 0.6f)))),
+                        .background(record.themeColor()),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(record.initials(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(
-                        text = record.appName,
-                        fontSize = 14.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
+                    Text(text = record.appName, fontSize = 14.5.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     Text(
                         text = "${record.packageName} • ${record.dateLabel()}",
                         fontSize = 11.sp,
@@ -419,9 +410,9 @@ private fun BuildCard(
 
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Text("📦 ${record.apkSizeMb} MB", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("🔧 Mode ${record.modeLabel.replace("Situs Web (URL)", "URL").replace("ZIP Offline", "ZIP").replace("Kode HTML", "HTML")}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("⏱ ${record.durationLabel}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("APK ${record.apkSizeMb} MB", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Mode ${record.modeLabel.replace("Situs Web (URL)", "URL").replace("ZIP Offline", "ZIP").replace("Kode HTML", "HTML")}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Durasi ${record.durationLabel}", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             if (!isSuccess && record.errorMessage != null) {
@@ -433,7 +424,7 @@ private fun BuildCard(
                         .border(1.dp, Color(0x4DF87171), RoundedCornerShape(12.dp))
                         .padding(10.dp)
                 ) {
-                    Text("⛔ ${record.errorMessage}", fontSize = 11.5.sp, color = Color(0xFFFCA5A5))
+                    Text(record.errorMessage, fontSize = 11.5.sp, color = Color(0xFFFCA5A5))
                 }
             }
 
@@ -483,12 +474,12 @@ private fun BuildCard(
                             .clickable { menuOpen = true },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("⋮", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("...", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(text = { Text("🔄 Bangun Ulang") }, onClick = { menuOpen = false; onRebuild() })
-                        DropdownMenuItem(text = { Text("📄 Salin Config") }, onClick = { menuOpen = false; onCopyConfig() })
-                        DropdownMenuItem(text = { Text("🗑 Hapus Build", color = Color(0xFFF87171)) }, onClick = { menuOpen = false; onDelete() })
+                        DropdownMenuItem(text = { Text("Bangun Ulang") }, onClick = { menuOpen = false; onRebuild() })
+                        DropdownMenuItem(text = { Text("Salin Config") }, onClick = { menuOpen = false; onCopyConfig() })
+                        DropdownMenuItem(text = { Text("Hapus Build", color = Color(0xFFF87171)) }, onClick = { menuOpen = false; onDelete() })
                     }
                 }
             }
