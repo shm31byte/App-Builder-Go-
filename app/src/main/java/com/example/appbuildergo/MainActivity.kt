@@ -2,16 +2,26 @@ package com.example.appbuildergo
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import android.graphics.Color as AndroidColor
+import com.example.appbuildergo.data.BuildRepository
+import com.example.appbuildergo.ui.AppBuilderGoApp
 import com.example.appbuildergo.ui.theme.AppBuilderGoTheme
-import com.example.appbuildergo.ui.wizard.WizardScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // FIX STATUS BAR PUTIH: edge-to-edge dengan status bar & navigation bar gelap transparan
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
+        BuildRepository.init(this)
         setContent {
             AppBuilderGoTheme {
-                WizardScreen()
+                AppBuilderGoApp()
             }
         }
     }
