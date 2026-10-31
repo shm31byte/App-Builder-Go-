@@ -3,7 +3,6 @@ package com.example.appbuilderGo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +23,7 @@ import com.example.appbuilderGo.ui.theme.AppBuilderGoTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // enableEdgeToEdge() DIHAPUS karena bikin crash di beberapa HP
         setContent {
             AppBuilderGoTheme {
                 Surface(
